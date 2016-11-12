@@ -1,0 +1,112 @@
+{% extends 'global_layout.html' %}
+
+{% block content_body %}
+
+  <script language="JavaScript">
+  function toggle(source) {
+    checkboxes = document.getElementsByName('list_selected');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      checkboxes[i].checked = source.checked;
+    }
+    check();
+  }
+  function check(){
+    checkboxes =document.getElementsByName('list_selected');
+    var result=true
+    for(var i=0;i<checkboxes.length;i++)
+    {
+      if(checkboxes[i].checked){
+        result=false;
+        break;
+      }
+
+    }
+    document.getElementById('delete').disabled=result
+  }
+  </script>
+<div class="pen-title">
+  <h1>ToDo-Dashboard </h1><span>Pen <i class='fa fa-paint-brush'></i> + <i class='fa fa-code'></i> by <a href='#'>Mayur Rastogi</a></span>
+</div>
+<!-- Form Module-->
+<div >
+  {% if form.errors %}
+  <div class="alert alert-danger">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+  {{ form.non_field_errors }}
+  </div>
+  {% endif %}
+  <div >
+    <form method="post" action=".">
+      {% csrf_token %}
+      <section class="content">
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="box box-success">
+              <div class="box-header">
+                <h3 class="box-title"></h3>
+                <div >
+                  <a href="#" class="pull-right btn-create"><i class="glyphicon glyphicon-plus pdr10"></i>Create a new List</a>
+                </div>
+                <div class="mailbox-controls mgt10">
+                  <!-- Check all button -->
+
+                  <div class="btn-group">
+                    <span title="Delete">
+                      <button type="submit" onclick="return confirm('Are you sure?')" class="btn btn-default btn-sm" id='delete' disabled><i class="fa fa-trash-o"></i></button>
+                    </span>
+                  </div>
+                  <!-- /.pull-right -->
+                </div>
+              </div>
+              <!-- /.box-header -->
+              <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                  <tr>
+                    <th class="check"><span title="Select All"><input type="checkbox" onClick="toggle(this)"></span></th>
+                    <th>Category Name</th>
+                    <th>Tasks</th>
+                    <th>User</th>
+                  </tr>
+                  {% for l in lists %}
+                  <tr>
+                    <td class="check"><input type="checkbox" name="list_selected" value="{{ l.id }}" onclick="check()"></td>
+                    <td><a href="#">{{l}}</a></td>
+                    <td><a href="{% url 'task_list' list_id=l.id %}" >View Tasks</a></td>
+                    <td>{{l.users}}</td>
+                  </tr>
+                  {% endfor %}
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="pull-right">
+            <div class="btn-group">
+              {% if lists.has_previous %}
+                <a href="?page={{ lists.previous_page_number }}"><button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button></a>
+              {% endif %}
+              <span class="current">
+                  Page {{ lists.number }} of {{ lists.paginator.num_pages }}.
+              </span>
+              {% if lists.has_next %}
+                <a href="?page={{ lists.next_page_number }}"><button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button></a>
+              {% endif %}
+
+            </div>
+            <!-- /.btn-group -->
+          </div>
+        </div>
+
+        <!-- Modal -->
+
+      </section>
+    </form>
+      <!-- /.content -->
+  </div>
+</div>
+
+  {% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'global_layout.html' %}
+
+{% block content_body %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+  <script language="JavaScript">
+  function toggle(source) {
+    checkboxes = document.getElementsByName('task_selected');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      checkboxes[i].checked = source.checked;
+    }
+    check();
+  }
+  function check(){
+    checkboxes =document.getElementsByName('task_selected');
+    var result=true
+    for(var i=0;i<checkboxes.length;i++)
+    {
+      if(checkboxes[i].checked){
+        result=false;
+        break;
+      }
+
+    }
+    document.getElementById('delete').disabled=result
+  }
+
+  </script>
+<div class="pen-title">
+  <h1>ToDo-Dashboard </h1><span>Pen <i class='fa fa-paint-brush'></i> + <i class='fa fa-code'></i> by <a href='#'>Mayur Rastogi</a></span>
+</div>
+
+
+
+<!-- Form Module-->
+<div >
+  {% if form.errors %}
+  <div class="alert alert-danger">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+  {{ form.non_field_errors }}
+  </div>
+  {% endif %}
+  <div >
+    <form method="post" action="{% url 'task_list' list_id=list_id %}" id="formId">
+      {% csrf_token %}
+      <section class="content">
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="box box-success">
+              <div class="box-header">
+                <h3 class="box-title"></h3>
+
+                <div>
+
+                  <a href="{% url 'task_create' list_id=list_id %}" class="pull-right btn-create"><i class="glyphicon glyphicon-plus pdr10"></i>Create a new Task</a>
+                </div>
+
+
+                <div class="mailbox-controls mgt10">
+                  <!-- Check all button -->
+
+                  <div class="btn-group">
+                    <span title="Delete">
+                      <button type="submit" onclick="return confirm('Are you sure?')" class="btn btn-default btn-sm" id='delete' name="Delete" disabled><i class="fa fa-trash-o"></i></button>
+                    </span>
+                    <div class="form-group has-feedback pull-right">
+                      <input class="form-control " type="text"  name="range" placeholder="Date range" id="reportrange"><i class="glyphicon glyphicon-calendar fa fa-calendar  form-control-feedback"></i></input>
+                      <script type="text/javascript">
+                      $(function() {
+
+                          var start = '{{start}}';
+                          var end = '{{end}}';
+                          function cb(start, end) {
+                              $('#reportrange').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+                          }
+                          $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+                              $('#formId').submit();
+                          });
+                          $('#reportrange').daterangepicker({
+                              startDate: start,
+                              endDate: end,
+                              locale: {
+                                format: 'YYYY/MM/DD'
+                              },
+                              ranges: {
+                                 'Today': [moment(), moment()],
+                                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                                 'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                                 'This Month': [moment().startOf('month'), moment().endOf('month')],
+                                 'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                              }
+                          }, cb);
+
+                          cb(start, end);
+
+                      });
+                      </script>
+                    </div>
+
+                  </div>
+
+                  <!-- /.pull-right -->
+                </div>
+              </div>
+              <!-- /.box-header -->
+
+              <div class="box-body table-responsive no-padding">
+                <table class="table table-hover">
+                  <tr>
+                    <th class="check"><span title="Select All"><input type="checkbox" onClick="toggle(this)"></span></th>
+                    <th>Task Name</th>
+                    <th>Priority</th>
+                    <th>State</th>
+                    <th>Due Date</th>
+                  </tr>
+                  {% for task in tasks %}
+                  <tr {% if task.due_date < today and task.state != "Done" %} bgcolor="red" {% elif task.state == "Todo" %}bgcolor="yellow" {% elif task.state == "Doing"%} bgcolor="green" {% elif task.state == "Done" %} bgcolor="#33b5e5"{% endif %}>
+                    <td class="check"><input type="checkbox" name="task_selected" value="{{ task.id }}" onclick="check()"></td>
+                    <td><a href="{% url 'task_view' list_id=list_id task=task.id %}">{{task}}</a></td>
+                    <td>{{task.priority}}</td>
+                    <td>{{task.state}}</td>
+                    <td>{{task.due_date}}</td>
+                  </tr>
+                  {% endfor %}
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="pull-right">
+            <div class="btn-group">
+              {% if tasks.has_previous %}
+                <a href="?page={{ tasks.previous_page_number }}"><button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button></a>
+              {% endif %}
+              <span class="current">
+                  Page {{ tasks.number }} of {{ tasks.paginator.num_pages }}.
+              </span>
+              {% if tasks.has_next %}
+                <a href="?page={{ tasks.next_page_number }}"><button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button></a>
+              {% endif %}
+
+            </div>
+            <!-- /.btn-group -->
+          </div>
+        </div>
+
+        <!-- Modal -->
+
+      </section>
+    </form>
+      <!-- /.content -->
+  </div>
+</div>
+
+  {% endblock %}
