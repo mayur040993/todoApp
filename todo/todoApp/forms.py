@@ -5,4 +5,4 @@ import datetime
 class TaskForm(forms.ModelForm):
     class Meta:
         model=Task
-        fields=['id','name','list_name','due_date','priority','state']
+        fields=['id','name','list_name','due_date','priority','state','description']

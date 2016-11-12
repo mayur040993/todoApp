@@ -41,7 +41,7 @@
 
             <!-- /.box-header -->
             <!-- form start -->
-            <form class="form-horizontal" action="{% if edit %} {% url 'task_edit' list_id=li.id task=task.id %} {% else %} {% url 'task_create' list_id=li.id %} {%endif%}" method="post">
+            <form class="form-horizontal" action="{% if edit %} {% url 'task_edit' list_id=li.id task=task.id %} {% else %} {% url 'task_create' list_id=li.id %} {%endif%}" method="post" id="usrform" >
               {% csrf_token %}
               <div class="box-body">
 
@@ -51,7 +51,13 @@
                     <input {% if form.name.errors %} style="border:1px solid #ff0000" placeholder="Task Name" {% else %} placeholder="Name" {%endif%} type="text" class="form-control" id="name"  name="name" value="{% if form.name.value %} {{form.name.value}} {% endif %}" {% if view %} disabled="True" {% endif %}>
                   </div>
                 </div>
+                <div class="form-group">
+                  <label for="description" class="col-sm-3 control-label">Description</label>
+                  <div class="col-sm-9">
 
+                    <textarea {% if form.description.errors %} style="border:1px solid #ff0000" placeholder="Description" {% else %} placeholder="Description" {%endif%} form="usrform" class="form-control" id="description"  name="description"  {% if view %} disabled="True" {% endif %}>{% if form.description.value %} {{form.description.value}} {% endif %}</textarea>
+                  </div>
+                </div>
               <div class="form-group">
                   <label for="list" class="col-sm-3 control-label">Category</label>
                   <div class="col-sm-9">
