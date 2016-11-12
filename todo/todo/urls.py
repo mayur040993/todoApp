@@ -16,9 +16,12 @@ Including another URLconf
 from django.conf.urls import url,include
 from django.contrib import admin
 from Account.views import login_view
+from todoApp.views import lists_view
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$',lists_view, name='dashboard'),
     url(r'^accounts/login/$', login_view, name='login_view'),
     url(r'^task/',include('todoApp.urls')),
+
 ]
